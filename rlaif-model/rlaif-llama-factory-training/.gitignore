@@ -1,0 +1,29 @@
+# Local training artifacts
+saves/
+logs/
+tmp/
+
+# Local datasets downloaded from Hugging Face. Keep only the index in Git.
+data/*
+!data/
+!data/dataset_info.json
+
+# Python/runtime cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local environments
+.venv/
+venv/
+*.egg-info/
+
+# Local configuration and third-party checkouts
+.env
+.env.*
+!.env.example
+LlamaFactory/
+llama-factory/
