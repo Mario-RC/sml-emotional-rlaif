@@ -1,0 +1,102 @@
+{
+  "sft_demonstration_dataset_foundation": {
+    "file_name": "sft_demonstration_dataset_foundation.json",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output",
+      "history": "history",
+      "system": "system"
+    }
+  },
+  "sft_demonstration_dataset_test_history": {
+    "file_name": "sft_demonstration_dataset_test_history.json",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output",
+      "history": "history",
+      "system": "system"
+    }
+  },
+  "sft_demonstration_dataset": {
+    "file_name": "sft_demonstration_dataset.json",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output",
+      "history": "history",
+      "system": "system"
+    }
+  },
+  "sft_demonstration_dataset_test": {
+    "file_name": "sft_demonstration_dataset_test.json",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output",
+      "history": "history",
+      "system": "system"
+    }
+  },
+  "rm_preference_dataset": {
+    "file_name": "rm_preference_dataset.json",
+    "ranking": true,
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "rm_preference_dataset_test": {
+    "file_name": "rm_preference_dataset_test.json",
+    "ranking": true,
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "human_annotations_reward_model_test": {
+    "file_name": "human_annotations_reward_model_test.json",
+    "ranking": true,
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "ppo_unlabeled_prompts_dataset": {
+    "file_name": "ppo_unlabeled_prompts_dataset.json",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output",
+      "history": "history",
+      "system": "system"
+    }
+  },
+  "ppo_unlabeled_prompts_dataset_test": {
+    "file_name": "ppo_unlabeled_prompts_dataset_test.json",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output",
+      "history": "history",
+      "system": "system"
+    }
+  },
+  "dpo_preference_dataset": {
+    "file_name": "dpo_preference_dataset.json",
+    "ranking": true,
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  }
+}
