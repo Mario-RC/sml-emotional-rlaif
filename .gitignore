@@ -169,18 +169,18 @@ om_cache/
 cache/
 config/
 saves/
+logs/
+tmp/
 output/
 wandb/
 swanlog/
 generated_predictions.jsonl
 
 # SML RLAIF local files
-rlaif-model/rlaif-llama-factory-training/.env
-rlaif-model/rlaif-llama-factory-training/.env.*
-!rlaif-model/rlaif-llama-factory-training/.env.example
-rlaif-model/rlaif-llama-factory-training/data/*
-!rlaif-model/rlaif-llama-factory-training/data/
-!rlaif-model/rlaif-llama-factory-training/data/dataset_info.json
-rlaif-model/rlaif-llama-factory-training/logs/
-rlaif-model/rlaif-llama-factory-training/saves/
-rlaif-model/rlaif-llama-factory-training/tmp/
+.env.*
+!.env.example
+data/*
+!data/
+!data/dataset_info.json
+LlamaFactory/
+llama-factory/
