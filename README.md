@@ -230,17 +230,6 @@ saves/gemma-2-2b-it/lora/dpo_3ep/adapter_model.safetensors
 saves/gemma-2-2b-it/predict/dpo_3ep/generated_predictions.jsonl
 ```
 
-## Local Artifacts
-
-The following paths are intentionally ignored by Git:
-
-- `.env`
-- `data/*.json`, except `dataset_info.json`
-- `logs/`
-- `saves/`
-- `tmp/`
-- `.venv/`, caches, bytecode, and generated prediction files
-
 ## Environment
 
 `run_sml.sh` loads `.env` when present and sets the following defaults before
