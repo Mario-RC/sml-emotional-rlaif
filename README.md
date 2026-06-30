@@ -255,6 +255,17 @@ launching LLaMA-Factory:
 Use `LLAMAFACTORY_CLI` when the desired executable is not the one installed in
 the active environment.
 
+## Hugging Face Models
+
+| Model | Base model | Alignment | Local adapter | Hugging Face |
+| --- | --- | :---: | --- | --- |
+| Gemma 2 2B IT PPO | `google/gemma-2-2b-it` | PPO | `saves/gemma-2-2b-it/lora/ppo_1ep` | [`mario-rc/emotional-rlaif-ppo-gemma-2-2b-it`](https://huggingface.co/mario-rc/emotional-rlaif-ppo-gemma-2-2b-it) |
+| Gemma 2 2B IT DPO | `google/gemma-2-2b-it` | DPO | `saves/gemma-2-2b-it/lora/dpo_1ep` | [`mario-rc/emotional-rlaif-dpo-gemma-2-2b-it`](https://huggingface.co/mario-rc/emotional-rlaif-dpo-gemma-2-2b-it) |
+| Llama 3.2 1B Instruct PPO | `meta-llama/Llama-3.2-1B-Instruct` | PPO | `saves/Llama-3.2-1B-Instruct/lora/ppo_1ep` | [`mario-rc/emotional-rlaif-ppo-llama-3.2-1b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-ppo-llama-3.2-1b-instruct) |
+| Llama 3.2 1B Instruct DPO | `meta-llama/Llama-3.2-1B-Instruct` | DPO | `saves/Llama-3.2-1B-Instruct/lora/dpo_1ep` | [`mario-rc/emotional-rlaif-dpo-llama-3.2-1b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-dpo-llama-3.2-1b-instruct) |
+| Llama 3.2 3B Instruct PPO | `meta-llama/Llama-3.2-3B-Instruct` | PPO | `saves/Llama-3.2-3B-Instruct/lora/ppo_1ep` | [`mario-rc/emotional-rlaif-ppo-llama-3.2-3b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-ppo-llama-3.2-3b-instruct) |
+| Llama 3.2 3B Instruct DPO | `meta-llama/Llama-3.2-3B-Instruct` | DPO | `saves/Llama-3.2-3B-Instruct/lora/dpo_1ep` | [`mario-rc/emotional-rlaif-dpo-llama-3.2-3b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-dpo-llama-3.2-3b-instruct) |
+
 ## License
 
 This project is released under the Apache License 2.0. See `LICENSE`.
