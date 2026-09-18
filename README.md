@@ -248,6 +248,10 @@ These six selected adapters are available on Hugging Face. Use the inference exa
 | Llama 3.2 3B Instruct | PPO | [`mario-rc/emotional-rlaif-ppo-llama-3.2-3b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-ppo-llama-3.2-3b-instruct) |
 | Llama 3.2 3B Instruct | DPO | [`mario-rc/emotional-rlaif-dpo-llama-3.2-3b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-dpo-llama-3.2-3b-instruct) |
 
+## Project Origin
+
+This project is based on the original [Mario-RC/aif-emotional-model](https://github.com/Mario-RC/aif-emotional-model) project.
+
 ## License
 
 This project is released under the Apache License 2.0. See `LICENSE`.
