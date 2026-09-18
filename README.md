@@ -59,7 +59,7 @@ it does not create the filenames expected by the training YAMLs. Prepare them as
 - Copy `dialogues/train.json` and `dialogues/test.json` to `ppo_unlabeled_prompts_dataset.json` and `ppo_unlabeled_prompts_dataset_test.json` inside `data/`.
 - Filter those dialogue files to rows with `set == "sft-demonstration"` to create `sft_demonstration_dataset.json` and `sft_demonstration_dataset_test.json`.
 - Copy `aif_annotations/train.json` to `data/dpo_preference_dataset.json`.
-- Supply `rm_preference_dataset.json` and `rm_preference_dataset_test.json` from the Phase 3 reward-model preference pipeline. They are separate RM datasets, not replacements for the DPO preference files downloaded above.
+- Supply `rm_preference_dataset.json` and `rm_preference_dataset_test.json` in `data/`. They are separate RM datasets, not replacements for the DPO preference files downloaded above.
 
 Expected local dataset files (optional entries are not used by `run_sml.sh`):
 
@@ -78,7 +78,7 @@ Expected local dataset files (optional entries are not used by `run_sml.sh`):
 ## Layout
 
 ```text
-sml-rlaif-alignment/
+sml-emotional-rlaif/
   README.md
   LICENSE
   pyproject.toml
@@ -117,6 +117,8 @@ python -m pip install -e ".[metrics]" "transformers==4.45.2" "peft==0.11.1" "trl
 
 The editable install exposes the `llamafactory-cli` console entrypoint used by
 the SML scripts.
+
+`run_sml.sh` uses this repository's source and prefers its local `.venv`.
 
 Gemma and Meta Llama checkpoints require accepting the base-model terms and
 authenticating with Hugging Face:

@@ -9,6 +9,11 @@ if [ -f .env ]; then
   set +a
 fi
 
+if [ -d .venv/bin ]; then
+  export PATH="$(pwd)/.venv/bin:$PATH"
+fi
+export PYTHONPATH="$(pwd)/src${PYTHONPATH:+:$PYTHONPATH}"
+
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
 export DISABLE_VERSION_CHECK=1
 export PYTHONUNBUFFERED=1
