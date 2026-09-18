@@ -67,7 +67,17 @@ def _extract_three(text):
     return found[:3]
 
 
+def _validate_prediction_count(targets, predictions, prediction_path):
+    if len(predictions) != len(targets):
+        raise ValueError(
+            f"Prediction count mismatch in {prediction_path}: "
+            f"expected {len(targets)}, found {len(predictions)}. "
+            "Regenerate the complete prediction file before calculating metrics."
+        )
+
+
 def _score_predictions(targets, predictions):
+    _validate_prediction_count(targets, predictions, "metric inputs")
     count_user_emo, count_chatbot_emo, count_neutral_emo = 0, 0, 0
 
     for target, prediction in zip(targets, predictions):
@@ -118,8 +128,9 @@ def _prepare_sft_records(model):
 
     results_sft_d_3ep = _read_jsonl(prediction_path)
     d_data = _load_json(SFT_DATA_PATH)
+    _validate_prediction_count(d_data, results_sft_d_3ep, prediction_path)
 
-    for idx, result_sft_d_3ep in enumerate(results_sft_d_3ep[:len(d_data)]):
+    for idx, result_sft_d_3ep in enumerate(results_sft_d_3ep):
         d_data[idx].pop("input", None)
         d_data[idx]["prompt"] = d_data[idx].pop("instruction")
         d_data[idx]["instruction"] = d_data[idx].pop("system")
@@ -149,6 +160,9 @@ def _prepare_rlaif_records(model):
         return None, None, ()
 
     dpr_data = _load_json(DPR_DATA_PATH)
+    for run_name, results in run_results.items():
+        prediction_path = f"./saves/{model}/predict/{run_name}/generated_predictions.jsonl"
+        _validate_prediction_count(dpr_data, results, prediction_path)
     for idx, entry in enumerate(dpr_data):
         entry.pop("input", None)
         entry["prompt"] = entry.pop("instruction")
@@ -157,8 +171,7 @@ def _prepare_rlaif_records(model):
         entry["prompt"] = entry.pop("prompt")
         entry["target"] = entry.pop("output")
         for run_name, results in run_results.items():
-            if idx < len(results):
-                entry["predict_" + run_name] = results[idx]["predict"].replace("\n", "").strip()
+            entry["predict_" + run_name] = results[idx]["predict"].replace("\n", "").strip()
         entry["model"] = model
         entry["did"] = entry.pop("did", entry.pop("dialogue_id", str(idx)))
 
