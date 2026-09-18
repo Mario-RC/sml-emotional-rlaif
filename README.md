@@ -40,11 +40,11 @@ Training and evaluation stages:
 
 ## Data Source
 
-Training and prediction datasets are published in the Hugging Face dataset
+Dialogue and DPO preference datasets are published in the Hugging Face dataset
 [`mario-rc/aif-emotional-generation`](https://huggingface.co/datasets/mario-rc/aif-emotional-generation).
 The tracked LLaMA-Factory dataset registry lives at `data/dataset_info.json`.
 
-Download the JSON datasets into the project data directory:
+Download the source JSON datasets into the project data directory:
 
 ```bash
 huggingface-cli download mario-rc/aif-emotional-generation \
@@ -53,14 +53,22 @@ huggingface-cli download mario-rc/aif-emotional-generation \
   --include "*.json"
 ```
 
-Expected local dataset files:
+The download preserves the `dialogues/` and `aif_annotations/` subdirectories;
+it does not create the filenames expected by the training YAMLs. Prepare them as follows:
+
+- Copy `dialogues/train.json` and `dialogues/test.json` to `ppo_unlabeled_prompts_dataset.json` and `ppo_unlabeled_prompts_dataset_test.json` inside `data/`.
+- Filter those dialogue files to rows with `set == "sft-demonstration"` to create `sft_demonstration_dataset.json` and `sft_demonstration_dataset_test.json`.
+- Copy `aif_annotations/train.json` to `data/dpo_preference_dataset.json`.
+- Supply `rm_preference_dataset.json` and `rm_preference_dataset_test.json` from the Phase 3 reward-model preference pipeline. They are separate RM datasets, not replacements for the DPO preference files downloaded above.
+
+Expected local dataset files (optional entries are not used by `run_sml.sh`):
 
 | Local file | Used for |
 | --- | --- |
 | `data/sft_demonstration_dataset.json` | demonstration SFT training |
-| `data/sft_demonstration_dataset_foundation.json` | registered foundation SFT split |
+| `data/sft_demonstration_dataset_foundation.json` | optional registered foundation SFT split |
 | `data/sft_demonstration_dataset_test.json` | demonstration SFT prediction and analysis |
-| `data/sft_demonstration_dataset_test_history.json` | registered history-aware SFT test split |
+| `data/sft_demonstration_dataset_test_history.json` | optional registered history-aware SFT test split |
 | `data/rm_preference_dataset.json` | reward model training |
 | `data/rm_preference_dataset_test.json` | reward model prediction |
 | `data/dpo_preference_dataset.json` | DPO training |
@@ -89,28 +97,28 @@ sml-rlaif-alignment/
 
 ## Setup After Clone
 
-Create and activate a project-local virtual environment from the repository
-root:
+Create and activate a project-local Python 3.10 environment from the repository
+root. Pin the core training dependencies to the versions used for these models:
 
 ```bash
-python3 -m venv .venv
+python3.10 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip setuptools wheel
-python -m pip install -e ".[torch,metrics]"
+python -m pip install -e ".[torch,metrics]" "torch==2.5.1" "transformers==4.45.2" "peft==0.11.1" "trl==0.8.6" "accelerate==0.34.0" "datasets==2.16.0" "huggingface_hub==0.27.1"
 ```
 
 If your node requires a specific CUDA-enabled PyTorch build, install that
 PyTorch wheel first, then install the editable package:
 
 ```bash
-python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
-python -m pip install -e ".[metrics]"
+python -m pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124
+python -m pip install -e ".[metrics]" "transformers==4.45.2" "peft==0.11.1" "trl==0.8.6" "accelerate==0.34.0" "datasets==2.16.0" "huggingface_hub==0.27.1"
 ```
 
 The editable install exposes the `llamafactory-cli` console entrypoint used by
 the SML scripts.
 
-Meta Llama checkpoints may require accepting the model license and
+Gemma and Meta Llama checkpoints require accepting the base-model terms and
 authenticating with Hugging Face:
 
 ```bash
@@ -197,37 +205,19 @@ python emotional_results.py --models gemma-2-2b-it Llama-3.2-1B-Instruct --verbo
 The script reads generated prediction files from `saves/<model>/predict/` and
 writes per-model summaries under `saves/<model>/emotional_balanced/`.
 
+The released DPO/PPO adapters were evaluated on the same 392 English dialogue
+examples from `mario-rc/aif-emotional-generation/dialogues`, split `test`.
+SFT and RM use their respective stage-specific evaluation sets.
+
 ## Outputs
 
-Expected artifacts for each configured model:
+Expected artifacts for each model are grouped by training and prediction stage
+under `saves/`: adapters (`adapter_model.safetensors`), predictions
+(`generated_predictions.jsonl`) and metric summaries. This also includes the
+additional 3-epoch DPO run for Gemma 2B.
 
-```text
-saves/<model>/lora/sft_d_3ep/adapter_model.safetensors
-saves/<model>/predict/sft_d_3ep/generated_predictions.jsonl
-saves/<model>/emotional_balanced/sft_demonstration_dataset_test_results.json
-
-saves/<model>/lora/sft_dpr_3ep/adapter_model.safetensors
-saves/<model>/predict/sft_dpr_3ep/generated_predictions.jsonl
-
-saves/<model>/lora/rm_1ep/adapter_model.safetensors
-saves/<model>/predict/rm_1ep/generated_predictions.jsonl
-
-saves/<model>/lora/ppo_1ep/adapter_model.safetensors
-saves/<model>/predict/ppo_1ep/generated_predictions.jsonl
-
-saves/<model>/lora/dpo_1ep/adapter_model.safetensors
-saves/<model>/predict/dpo_1ep/generated_predictions.jsonl
-
-saves/<model>/emotional_balanced/ppo_unlabeled_prompts_dataset_test_results.json
-saves/<model>/emotional_balanced/emotional_results_summary.json
-```
-
-Gemma 2B also has the 3-epoch DPO run:
-
-```text
-saves/gemma-2-2b-it/lora/dpo_3ep/adapter_model.safetensors
-saves/gemma-2-2b-it/predict/dpo_3ep/generated_predictions.jsonl
-```
+Per-model metric files and `emotional_results_summary.json` are written under
+`saves/<model>/emotional_balanced/`, as described in [Analysis](#analysis).
 
 ## Environment
 
@@ -245,14 +235,16 @@ the active environment.
 
 ## Hugging Face Models
 
-| Model | Base model | Alignment | Local adapter | Hugging Face |
-| --- | --- | :---: | --- | --- |
-| Gemma 2 2B IT PPO | `google/gemma-2-2b-it` | PPO | `saves/gemma-2-2b-it/lora/ppo_1ep` | [`mario-rc/emotional-rlaif-ppo-gemma-2-2b-it`](https://huggingface.co/mario-rc/emotional-rlaif-ppo-gemma-2-2b-it) |
-| Gemma 2 2B IT DPO | `google/gemma-2-2b-it` | DPO | `saves/gemma-2-2b-it/lora/dpo_1ep` | [`mario-rc/emotional-rlaif-dpo-gemma-2-2b-it`](https://huggingface.co/mario-rc/emotional-rlaif-dpo-gemma-2-2b-it) |
-| Llama 3.2 1B Instruct PPO | `meta-llama/Llama-3.2-1B-Instruct` | PPO | `saves/Llama-3.2-1B-Instruct/lora/ppo_1ep` | [`mario-rc/emotional-rlaif-ppo-llama-3.2-1b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-ppo-llama-3.2-1b-instruct) |
-| Llama 3.2 1B Instruct DPO | `meta-llama/Llama-3.2-1B-Instruct` | DPO | `saves/Llama-3.2-1B-Instruct/lora/dpo_1ep` | [`mario-rc/emotional-rlaif-dpo-llama-3.2-1b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-dpo-llama-3.2-1b-instruct) |
-| Llama 3.2 3B Instruct PPO | `meta-llama/Llama-3.2-3B-Instruct` | PPO | `saves/Llama-3.2-3B-Instruct/lora/ppo_1ep` | [`mario-rc/emotional-rlaif-ppo-llama-3.2-3b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-ppo-llama-3.2-3b-instruct) |
-| Llama 3.2 3B Instruct DPO | `meta-llama/Llama-3.2-3B-Instruct` | DPO | `saves/Llama-3.2-3B-Instruct/lora/dpo_1ep` | [`mario-rc/emotional-rlaif-dpo-llama-3.2-3b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-dpo-llama-3.2-3b-instruct) |
+These six selected adapters are available on Hugging Face. Use the inference example and tokenizer from the corresponding adapter repository; each model card documents its training parameters and license.
+
+| Model | Alignment | Hugging Face |
+| --- | --- | --- |
+| Gemma 2 2B IT | PPO | [`mario-rc/emotional-rlaif-ppo-gemma-2-2b-it`](https://huggingface.co/mario-rc/emotional-rlaif-ppo-gemma-2-2b-it) |
+| Gemma 2 2B IT | DPO | [`mario-rc/emotional-rlaif-dpo-gemma-2-2b-it`](https://huggingface.co/mario-rc/emotional-rlaif-dpo-gemma-2-2b-it) |
+| Llama 3.2 1B Instruct | PPO | [`mario-rc/emotional-rlaif-ppo-llama-3.2-1b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-ppo-llama-3.2-1b-instruct) |
+| Llama 3.2 1B Instruct | DPO | [`mario-rc/emotional-rlaif-dpo-llama-3.2-1b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-dpo-llama-3.2-1b-instruct) |
+| Llama 3.2 3B Instruct | PPO | [`mario-rc/emotional-rlaif-ppo-llama-3.2-3b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-ppo-llama-3.2-3b-instruct) |
+| Llama 3.2 3B Instruct | DPO | [`mario-rc/emotional-rlaif-dpo-llama-3.2-3b-instruct`](https://huggingface.co/mario-rc/emotional-rlaif-dpo-llama-3.2-3b-instruct) |
 
 ## License
 
